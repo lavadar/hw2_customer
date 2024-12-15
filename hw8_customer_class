@@ -1,0 +1,48 @@
+import pandas as pd
+
+class Customer:
+    def __init__(self, full_name, gender, age, purchase_amount, device, browser, region):
+        self.full_name = full_name
+        self.gender = gender
+        self.age = age
+        self.purchase_amount = purchase_amount
+        self.device = device
+        self.browser = browser
+        self.region = region
+        
+    def get_description(self):
+        gender_word = "женского" if self.gender == 'female' else "мужского"
+        return (f"Пользователь {self.full_name} {gender_word} пола, {self.age} лет "
+                f"совершила покупку на {self.purchase_amount} у.е. с {self.device} браузера {self.browser}. "
+                f"Регион, из которого совершалась покупка: {self.region}.")
+
+def load_data(file_path):
+    return pd.read_csv(file_path)
+
+def parse_customer_data(row):
+    return Customer(
+        full_name = row['name'],
+        gender = row['sex'],
+        age = int(row['age']),
+        purchase_amount = row['bill'],
+        device = row['device_type'],
+        browser = row['browser'],
+        region = row['region']
+    )
+
+def write_descriptions_to_file(descriptions, output_file):
+    with open(output_file, 'w', encoding='utf-8') as f:
+        for description in descriptions:
+            f.write(description + '\n')
+
+def main():
+    data = load_data('web_clients_correct.csv')
+    
+    descriptions = []
+    for index, row in data.iterrows():
+        customer = parse_customer_data(row)
+        descriptions.append(customer.get_description())
+    
+    write_descriptions_to_file(descriptions, 'output.txt')
+
+main()
